@@ -53,6 +53,9 @@ if __name__ == '__main__':
         return err, grad
 
     print('Desired ee roll and pitch:', desired_ee_rp)
+    '''
+    TODO: Fill in start and target joint positions 
+    '''
     joints_start = fr.home_joints.copy()
     joints_start[0] = -np.deg2rad(45)
     joints_target = joints_start.copy()

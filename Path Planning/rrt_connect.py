@@ -97,8 +97,8 @@ class RRTConnect:
         while is_collision:
             q_sample = self.sample_valid_joints()
 
-            node_id_near = tree.get_nearest_node(q_sample)[0]
-            q_near = tree.get_point(node_id_near)
+            node_id_near = tree_0.get_nearest_node(q_sample)[0]
+            q_near = tree_0.get_point(node_id_near)
             q_new = q_near + min(self._q_step_size, np.linalg.norm(q_sample - q_near)) * (q_sample - q_near) / np.linalg.norm(q_sample - q_near)
 
             q_new = self.project_to_constraint(q_new, constraint)
@@ -112,7 +112,7 @@ class RRTConnect:
             # Add the q_new as vertex, and the edge between q_new and q_near as edge to the tree
             node_id_new = tree_0.insert_new_node(q_new, node_id_near)
             node_id_1 = tree_1.get_nearest_node(q_new)[0]
-            q_1 = tree.get_point(node_id_1)
+            q_1 = tree_1.get_point(node_id_1)
             # if the new state is close to the target state, then we reached the target state
             if np.linalg.norm(q_new - q_1) < self._connect_dist and self._is_seg_valid(q_new, q_1):
                 target_reached = True

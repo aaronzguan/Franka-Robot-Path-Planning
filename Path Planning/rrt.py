@@ -123,6 +123,7 @@ class RRT:
             nearest_node_id = tree.get_nearest_node(q_sample)[0]
             q_near = tree.get_point(nearest_node_id)
             q_new = q_near + min(self._q_step_size, np.linalg.norm(q_sample - q_near)) * (q_sample - q_near) / np.linalg.norm(q_sample - q_near)
+            		
             # Check if the new node has collision with the constraint
             q_new = self.project_to_constraint(q_new, constraint)
 

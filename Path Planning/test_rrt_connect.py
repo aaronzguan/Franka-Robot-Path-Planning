@@ -1,9 +1,6 @@
 import argparse
 import numpy as np
-from time import sleep
 import rospy
-from tqdm import tqdm
-from frankapy import FrankaArm
 
 from franka_robot import FrankaRobot 
 from collision_boxes_publisher import CollisionBoxesPublisher
@@ -12,17 +9,13 @@ from rrt_connect import RRTConnect
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--run_on_robot', action='store_true')
     parser.add_argument('--seed', '-s', type=int, default=0)
     args = parser.parse_args()
 
     np.random.seed(args.seed)
     fr = FrankaRobot()
 
-    if args.run_on_robot:
-        fa = FrankaArm()
-    else:
-        rospy.init_node('rrt')
+    rospy.init_node('rrt')
 
     '''
     TODO: Replace obstacle box w/ the box specs in your workspace:
@@ -30,7 +23,8 @@ if __name__ == '__main__':
     '''
     boxes = np.array([
         # obstacle
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        # [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0.4, 0, 0.25, 0, 0, 0, 0.3, 0.05, 0.5],
         # sides
         [0.15, 0.46, 0.5, 0, 0, 0, 1.2, 0.01, 1.1],
         [0.15, -0.46, 0.5, 0, 0, 0, 1.2, 0.01, 1.1],
@@ -72,11 +66,15 @@ if __name__ == '__main__':
     '''
     TODO: Fill in start and target joint positions 
     '''
-    joints_start = None
-    joints_target = None
+    # joints_start = None
+    # joints_target = None
+    joints_start = fr.home_joints.copy()
+    joints_start[0] = -np.deg2rad(45)
+    joints_target = joints_start.copy()
+    joints_target[0] = np.deg2rad(45)
 
     rrtc = RRTConnect(fr, is_in_collision)
-    constraint = None # ee_upright_constraint
+    constraint = ee_upright_constraint
     plan = rrtc.plan(joints_start, joints_target, constraint)
     
     collision_boxes_publisher = CollisionBoxesPublisher('collision_boxes')
@@ -90,42 +88,3 @@ if __name__ == '__main__':
         collision_boxes_publisher.publish_boxes(boxes)
 
         i += 1
-        if args.run_on_robot:
-            if i == len(plan) - 1:
-                while True:
-                    inp = input('Would you like to [c]ontinue to execute the plan or [r]eplay the plan? ')
-                    if inp in ('r', 'c'):
-                        break
-                    print('Please enter a valid input! Only c and r are accepted!')
-                if inp == 'r':
-                    i = 0
-                else:
-                    break
-    
-    if args.run_on_robot:
-        while True:
-            input('Press [Enter] to run guide mode for 10s and move robot to near the strat configuration.')
-            fa.apply_effector_forces_torques(10, 0, 0, 0)
-
-            while True:
-                inp = input('Would you like to [c]ontinue or [r]erun guide mode? ')
-                if inp in ('r', 'c'):
-                    break
-                print('Please enter a valid input! Only c and r are accepted!')
-
-            if inp == 'c':
-                break
-
-        print('Running plan...')
-        fa.goto_joints(joints_start)
-        forward_plan = plan[::4] # subsample plan by 1 in 4
-        backward_plan = forward_plan[::-1]
-
-        while True:
-            for joints in tqdm(forward_plan):
-                fa.goto_joints(joints, duration=max(float(max(joints - fa.get_joints()) / 0.1), 1))
-                sleep(0.1)
-            sleep(1)
-            for joints in tqdm(backward_plan):
-                fa.goto_joints(joints, duration=max(float(max(joints - fa.get_joints()) / 0.1), 1))
-                sleep(0.1)

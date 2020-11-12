@@ -13,3 +13,19 @@ The Constrained RRT planning algorithm is as below:
 ![constrainRRT](images/ConstrainedExtend.png)
 
 * [Here](./Path%20Planning/demo) shows the demo video of both RRT and Constrained RRT for the Franka Robot in the simulation.
+
+## Installation
+
+For Ubuntu 16.04:
+
+1. Install ROS Kinetic on your computer following instructions here: [http://wiki.ros.org/ kinetic/Installation/Ubuntu.](http://wiki.ros.org/ kinetic/Installation/Ubuntu. ) (Make sure to install the Desktop-Full Install version of ROS Kinetic.)
+
+2. Install libfranka and franka_ros using the following command:
+
+   `sudo apt install ros-kinetic-libfranka ros-kinetic-franka-ros`
+
+3. Install all requirements.
+
+   `pip install -r requirements.txt`
+
+4. Change the path argument in visualize.launch to the path to your working folder.

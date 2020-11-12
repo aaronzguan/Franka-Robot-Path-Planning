@@ -2,9 +2,9 @@
 
 <launch>
   <arg name="load_gripper" default="true" />
-  <!-- <arg name="path" default="/home/student/Documents/hw3" /> -->
-  <arg name="path" default="/home/aaronguan/Desktop/16662-RobotAutonomy/Homework/hw3" />
-  
+  <!-- <arg name="path" default="/home/student/Documents/autonomy" /> -->
+  <arg name="path" default="/home/aaronguan/Desktop/Franka\ Robot\ Path\ Planning/Path\ Planning" />
+
   <param unless="$(arg load_gripper)" name="robot_description" command="$(find xacro)/xacro --inorder $(find franka_description)/robots/panda_arm.urdf.xacro" />
   <param if="$(arg load_gripper)" name="robot_description" command="$(find xacro)/xacro --inorder $(find franka_description)/robots/panda_arm_hand.urdf.xacro" />
 
